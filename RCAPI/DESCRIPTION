@@ -1,0 +1,9 @@
+Package: RCAPI
+Title: Playing around with Rs C API
+Version: 0.1
+Date: 2024-06-06
+Author: Krämer Konrad [aut, cre]
+Maintainer: Krämer Konrad <konrad_kraemer@yahoo.de>
+Description: Summarising the possibilities of Rs C API as a kind of coded documentation
+License: GPL-3
+Encoding: UTF-8
