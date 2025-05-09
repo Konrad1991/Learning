@@ -8,6 +8,8 @@
 # 6 | Shared function argument + multiple names in env (extra protection).
 devtools::load_all("~/Documents/Learning/RCAPI/")
 
+RCAPI:::test_eval("1 + 2 * 3", environment())
+
 a <- 1
 shared <- 2
 c <- shared
