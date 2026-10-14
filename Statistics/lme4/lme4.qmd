@@ -1,0 +1,166 @@
+---
+format:
+  html
+---
+
+### Data
+
+```{r}
+library(lme4)
+head(sleepstudy)
+tail(sleepstudy)
+```
+
+### Example Nr. 1
+
+- For each subject (person) one intercept is added by specifying (1 | subject)
+
+```{r}
+m <- lmer(Reaction ~ Days + (1 | Subject), data = sleepstudy)
+summary(m)
+model_latex <- equatiomatic::extract_eq(m)
+knitr::asis_output(paste0( "$$", model_latex, "$$"))
+```
+
+### Example Nr. 2
+
+- For each subject one intercept and a own slope is used by specifying (Days | Subject)
+
+```{r}
+m <- lmer(Reaction ~ Days + (Days | Subject), data = sleepstudy)
+model_latex <- equatiomatic::extract_eq(m)
+knitr::asis_output(paste0( "$$", model_latex, "$$"))
+summary(m)
+```
+
+### Normales lm
+
+$y = X\beta + \epsilon$
+
+where:
+
+$\beta =
+\begin{pmatrix}
+  \beta_0 \\
+  \beta_1
+\end{pmatrix}
+$
+
+### linear mixed model
+
+$y = X\beta + Zb + \epsilon$
+
+where:
+
+- the matrix Z decodes:
+  * which observation belongs to which subject
+  * which slopes belong to which subject
+- the vector b contains the estimated parameters:
+  * the random intercepts
+  * the random slopes
+  * $b = (b_{01}, b_{11}, b_{02}, b_{12}, ...)^T$
+
+
+### Considering the second example
+
+$\begin{pmatrix}
+  b_{0j} \\
+  b_{1j}
+\end{pmatrix} \sim \mathcal{N}(0, \Sigma)$
+
+where:
+
+$\Sigma = \begin{pmatrix}
+  \sigma_0^2 && \rho\sigma_0\sigma_1 \\
+  \rho\sigma_0\sigma_1 && \sigma_1^2
+\end{pmatrix}$
+
+
+For the model
+
+```{r}
+m <- lmer(Reaction ~ Days + (Days | Subject), data = sleepstudy)
+```
+
+the estimated model can be written as
+
+$$
+\text{Reaction}_{ij}
+=
+(251.4 + b_{0j})
++
+(10.47 + b_{1j}) \cdot \text{Days}_{ij}
++
+\varepsilon_{ij}
+$$
+
+where
+
+$$
+b_{0j} \sim N(0, 24.74^2)
+$$
+
+and
+
+$$
+b_{1j} \sim N(0, 5.92^2)
+$$
+
+This means:
+- the global intercept is approximately \(251.4\)
+- each subject receives an additional intercept offset with a standard deviation of approximately \(24.7\)
+- the global slope for `Days` is approximately \(10.47\)
+- each subject receives an additional slope offset with a standard deviation of approximately \(5.9\)
+
+An example subject could therefore have the model
+
+$$
+(251.4 + 20) + (10.47 - 3)\cdot \text{Days}
+$$
+
+The estimated correlation between the random intercepts
+and random slopes is approximately \(0.07\),
+indicating almost no relationship between both effects.
+
+
+### Visualization
+
+```{r}
+library(ggplot2)
+ggplot(sleepstudy,
+       aes(Days, Reaction, group = Subject)) +
+  geom_point() +
+  geom_line(alpha = 0.4) +
+  geom_smooth(method = "lm", se = FALSE, color = "red")
+```
+
+### Assumptions
+
+```{r}
+m <- lmerTest::lmer(
+  Reaction ~ Days + (Days | Subject),
+  data = sleepstudy
+)
+qqnorm(residuals(m))
+qqline(residuals(m))
+
+library(ggplot2)
+df_plot <- data.frame(
+  fitted = fitted(m),
+  residuals = resid(m)
+)
+ggplot(df_plot, aes(fitted, residuals)) +
+  geom_point() +
+  geom_hline(yintercept = 0, linetype = 2)
+```
+
+### Inference
+
+```{r}
+m <- lmerTest::lmer(
+  Reaction ~ Days + (Days | Subject),
+  data = sleepstudy
+)
+summary(m)
+anova(m)
+```

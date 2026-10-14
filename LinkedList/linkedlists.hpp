@@ -59,7 +59,6 @@ public:
   void insert(T& elem, size_t idx) {
     Node<T>* newNode = new Node<T>(elem); 
     if(idx > size) throw std::range_error("Index above size");
-    if(idx < 0) throw std::range_error("Index smaller 0");
 
     if(idx == size) {
       newNode -> next = nullptr;
@@ -130,8 +129,6 @@ public:
 
   T& operator[](size_t idx) {
     if(idx > size) throw std::range_error("Index above size");
-    if(idx < 0) throw std::range_error("Index smaller 0");
-
     if(idx == size) {
       return tail -> val;
     } else if(idx == 0) {
@@ -204,7 +201,6 @@ public:
   size_t sz() const noexcept {
     return size;
   }
-
 };
 
 #endif
