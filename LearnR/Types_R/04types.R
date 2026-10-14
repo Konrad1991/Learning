@@ -1,5 +1,5 @@
 if (!grepl("Types_R", getwd())) {
-  setwd("./Types_R")
+  setwd("./LearnR/Types_R")
 }
 dyn.unload("04types.so")
 system("R CMD SHLIB 04types.c")
